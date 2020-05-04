@@ -1,50 +1,28 @@
-# ClimateIsca
-This Julia package is geared towards the sorting and analysis of output from the Isca GCM created
-by the Climate Dynamics group led by Geoffrey Vallis from the University of Exeter.  It also throws
-in calculations of some of the more common atmospheric parameters such as moisture fluxes and
-streamfunction calculations.
+# **<div align="center">IscaTools.jl</div>**
 
-The current status of `ClimateIsca.jl` is as follows:
-* Resorting of default Isca output parameters: In Development
-* Analysis of variables: In Development
-* Calculation of common atmospheric parameters: In Development
+**Created By:** Nathanael Wong (nathanaelwong@fas.harvard.edu)
 
-## Installation
-`ClimateIsca.jl` is not yet a registered Julia package (ETA: January 2020).  Please clone this
-package from the GitHub repository:
-```
-Pkg.clone("https://github.com/natgeo-wong/ClimateIsca.jl")
-```
+**Developer To-Do for v1.0:**
+* [ ] Testing of `analysis` functions
+* [ ] Comprehensive documentation and Jupyter notebook examples
+* [ ] `iscaquery` function series development
+* [ ] Calculations for the following variables:
+	* [ ] Meridional Streamfunctions
+	* [ ] Total Rainfall, Total Snowfall, Total Column Water
+	* [ ] Eddy Kinetic Energy
+	* [ ] Momentum and Heat Fluxes
 
-## Prerequisites:
-`ClimateIsca.jl` assumes that you have set up the following environment for Isca:
-```
-export GFDL_DATA=(Your Isca data directory here)
-```
+## Introduction
 
-`ClimateIsca.jl` will then create data directories at the same level as `GFDL_DATA` named
-`isca_resort` and `isca_ana`, and all outputs from the `resort` and `analysis` functions will be
-moved to these folders.
+`IscaTools.jl` is a Julia package that aims to streamline the following processes:
+* Management of output from the [Isca](https://execlim.github.io/IscaWebsite/) GCM developed by the University of Exeter
+* Calculation of commonly-used variables (and saving back into original NetCDF output file)
+* Basic analysis of output (yearly/monthy means, etc.)
 
-For example, in Odyssey/Cannon, I have my data directories set up as:
+`IscaTools.jl` can be installed via
 ```
-GFDL_DATA=/n/holylfs/LABS/kuang_lab/nwong/isca/isca_out
+] add IscaTools
 ```
 
-`ClimateIsca.jl` will therefore set up my resort and analysis directories as
-```
-/n/holylfs/LABS/kuang_lab/nwong/isca/isca_resort
-/n/holylfs/LABS/kuang_lab/nwong/isca/isca_analysis
-```
-
-## Projects, Experiments and Configurations
-`ClimateIsca.jl` assumes that your data output from the Isca GCM has at least two tiers:
-* `Project`: Highest level, contains all your output for an entire project
-* `Experiment`: Second level (optional), contains output for a group of configurations with a common setting
-    - Generally meant for changes in major settings.
-    - e.g. spatial resolution (T42/T85/...), radiative scheme (Grey/RRTM/...), etc.
-* `Configuration`: Lowest level, contains output for a specific configuration case investigated
-    - Generally meant for specific phenomenon being investigated.
-    - e.g. land mask, surface heat forcing, etc.
-
-The data results from spinups for a `Project` is assumed to be found in the `Configuration` level of the project.  If there is an `Experiment` Tier, then each `Experiment` is assumed to have a spinup.
+Of course, before using `IscaTools.jl`, you need to download the GCM to generate the output from:
+* The Isca GCM [[GitHub](https://github.com/ExeClim/Isca)] [[Website](https://execlim.github.io/IscaWebsite/)]
