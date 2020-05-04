@@ -1,0 +1,91 @@
+# (1)Mode,(2)ID,(3)IDnc,(4)era5,(5)erai,(6)Full,(7)Units
+
+# SURFACE DRY PARAMETERS
+dsfc,u_10m,Surface Zonal Wind (10m),m s^{-1}
+dsfc,v_10m,Surface Meridional Wind (10m),m s^{-1}
+dsfc,t_surf,Surface Temperature,K
+dsfc,temp_2m,Surface Temperature (2m),K
+dsfc,ps,Surface Pressure,Pa
+dsfc,slp,Sea-Level Pressure,Pa
+dsfc,albedo,Surface Albedo,N/A
+dsfc,rrtm_albedo,RRTM Interactive Albedo,N/A
+dsfc,z_pbl,z_pbl,Planetary Boundary Layer Depth,m
+
+# SURFACE MOIST PARAMETERS
+msfc,sphum_2m,Surface Specific Humidity (2m),kg kg^{-1}
+msfc,rh_2m,Surface Relative Humidity (2m),kg kg^{-1}
+msfc,ml_heat_cap,Mixed Layer Heat Capacity,J K^{-1} m^{-2}
+msfc,condensation_rain,Rainfall Rate (Condensation),kg m^{-2} s^{-1}
+msfc,convection_rain,Rainfall Rate (Convection),kg m^{-2} s^{-1}
+msfc,precipitation,Precipitation Rate (All),kg m^{-2} s^{-1}
+msfc,cape,Convective Available Potential Energy,J kg^{-1}
+msfc,flux_lhe,Surface Upwards Latent Heat Flux,W m^{2} s^{-1}
+msfc,flux_oceanq,Oceanic Surface Heat Flux,W m^{-2}
+
+# FULL PRESSURE DRY PARAMETERS
+dpre,vor,Vorticity,s^{-1}
+dpre,div,Divergence,s^{-1}
+dpre,ucomp,Zonal Wind,m s^{-1}
+dpre,vcomp,Meridional Wind,m s^{-1}
+dpre,omega,Vertical Wind,Pa s^{-1}
+dpre,wspd,Horizontal Wind,m s^{-1}
+dpre,pres_full,Pressure,Pa
+dpre,temp,Air Temperature,K
+dpre,height,Geopotential Height,m
+dpre,tdt_sw,Temperature Tendency (Shortwave),K s^{-1}
+dpre,tdt_lw,Temperature Tendency (Longwave),K s^{-1}
+dpre,tdt_rad,Temperature Tendency (All Radiation),K s^{-1}
+
+# FULL PRESSURE MOIST PARAMETERS
+mpre,sphum,Specific Humidity,kg kg^{-1}
+mpre,rh,Relative Humidity,%
+mpre,dt_qg_convection,Convective Moisture Tendency, kg^2 s^{-1}
+mpre,dt_tg_convection,Convective Temperature Tendency, kg^2 s^{-1}
+mpre,dt_qg_condensation,Condensation Moisture Tendency, kg^2 s^{-1}
+mpre,dt_tg_condensation,Condensation Temperature Tendency, kg^2 s^{-1}
+
+# MULTIPLIED PARAMETERS
+imul,ucomp_sq,Zonal Wind Squared,m^2 s^{-2}
+imul,ucomp_vcomp,Zonal Wind * Meridional Wind,m^2 s^{-2}
+imul,ucomp_omega,Zonal Wind * Vertical Wind,m Pa s^{-2}
+imul,vcomp_sq,Meridional Wind Squared,m^2 s^{-2}
+imul,vcomp_omega,Meridional Wind * Vertical Wind,m Pa s^{-2}
+imul,omega_sq,Vertical Wind Squared,Pa^2 s^{-2}
+imul,ucomp_temp,Zonal Wind * Temperature,m K s^{-1}
+imul,vcomp_temp,Meridional Wind * Temperature,m K s^{-1}
+imul,omega_temp,Vertical Wind * Temperature,Pa K s^{-1}
+imul,temp_sq,Temperature^2,K^2
+imul,vcomp_vor,Meridional Wind * Vorticity,m s^{-2}
+
+# HALF PRESSURE PARAMETERS
+half,pres_half,Pressure,Pa
+half,height_half,Geopotential Height,m
+half,flux_sw,Shortwave Radiative Flux (Upwards),W m^{2} s^{-1}
+half,flux_lw,Longwave Radiative Flux (Upwards),W m^{2} s^{-1}
+
+# HELD SUAREZ PARAMETERS
+held,udt_rdamp,Zonal Wind Tendency (Rayleigh Damping),m s^{-2}
+held,vdt_rdamp,Meridional Wind Tendency (Rayleigh Damping),m s^{-2}
+held,tdt_diss_rdamp,Dissipative Heating (Rayleigh Damping),K s^{-1}
+held,tdt_ndamp,Newtonian Heating,K s^{-1}
+held,local_heating,Local Heating,K s^{-1}
+held,tdt,Total Heating,K s^{-1}
+held,teq,Equilibrium Temperature,K
+
+# CALCULATED SURFACE PARAMETERS
+csfc,rain,Rainfall Rate (Total),kg m^{-2} s^{-1}
+csfc,snow,Snowfall Rate (Total),kg m^{-2} s^{-1}
+csfc,eke,Eddy Kinetic Energy,kg m^2 s^{-2}
+csfc,tcw,Total Column Water,kg m^{-2}
+
+# CALCULATED PRESSURE PARAMETERS
+cpre,flux_uv,Eddy Momentum Flux,m^2 s^{-2}
+cpre,flux_uT,Zonal Heat Flux,K m s^{-1}
+cpre,flux_vT,Poleward Heat Flux,K m s^{-1}
+cpre,flux_uq,Zonal Moisture Flux,K m s^{-1}
+cpre,flux_vq,Poleward Moisture Flux,K m s^{-1}
+cpre,psi_u,Zonal Streamfunction,kg s^{-1}
+cpre,psi_v,Meridional Streamfunction,kg s^{-1}
+cpre,psi_h,Horizontal Streamfunction,kg s^{-1}
+
+# CUSTOM DEFINED PARAMETERS
