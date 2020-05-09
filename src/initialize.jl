@@ -1,5 +1,5 @@
 """
-This file initializes the Climateisca module by setting and determining the
+This file initializes the IscaTools module by setting and determining the
 ECMWF reanalysis parameters to be analyzed and the regions upon which the data
 are to be extracted from.  Functionalities include:
     - Setting up of reanalysis module type
@@ -9,11 +9,11 @@ are to be extracted from.  Functionalities include:
 
 """
 
-# Climateisca Parameter Setup
+# IscaTools Parameter Setup
 
-function iscaparameterscopy(;overwrite::Bool=false)
+function iscaparametercopy(;overwrite::Bool=false)
 
-    jfol = joinpath(DEPOT_PATH[1],"files/ClimateIsca/"); mkpath(jfol);
+    jfol = joinpath(DEPOT_PATH[1],"files/IscaTools/"); mkpath(jfol);
     ftem = joinpath(@__DIR__,"../extra/partemplate.txt")
     fpar = joinpath(jfol,"iscaparameters.txt")
 
@@ -31,29 +31,29 @@ function iscaparameterscopy(;overwrite::Bool=false)
 
 end
 
-function iscaparametersload()
+function iscaparameterload()
 
     @debug "$(Dates.now()) - Loading information on the output parameters from the Isca GCM."
-    return readdlm(iscaparameterscopy(),',',comments=true);
+    return readdlm(iscaparametercopy(),',',comments=true);
 
 end
 
-function iscaparametersload(init::AbstractDict)
+function iscaparameterload(init::AbstractDict)
 
     @debug "$(Dates.now()) - Loading information on the output parameters from the Isca GCM."
-    allparams = readdlm(iscaparameterscopy(),',',comments=true);
+    allparams = readdlm(iscaparametercopy(),',',comments=true);
 
     @debug "$(Dates.now()) - Filtering out for parameters in the $(init["modulename"]) module."
     parmods = allparams[:,1]; return allparams[(parmods.==init["moduletype"]),:];
 
 end
 
-function iscaparametersdisp(parlist::AbstractArray,init::AbstractDict)
+function iscaparameterdisp(parlist::AbstractArray,init::AbstractDict)
     @info "$(Dates.now()) - The following variables are offered in the $(init["modulename"]) module:"
     for ii = 1 : size(parlist,1); @info "$(Dates.now()) - $(ii)) $(parlist[ii,6])" end
 end
 
-function iscaparametersadd(fadd::AbstractString)
+function iscaparameteradd(fadd::AbstractString)
 
     if !isfile(fadd); error("$(Dates.now()) - The file $(fadd) does not exist."); end
     ainfo = readdlm(fadd,',',comments=true); aparID = ainfo[:,2]; nadd = length(aparID);
@@ -66,13 +66,13 @@ function iscaparametersadd(fadd::AbstractString)
 
 end
 
-function iscaparametiscadd(;
+function iscaparameteradd(;
     modID::AbstractString, parID::AbstractString, ncID::AbstractString,
     full::AbstractString, unit::AbstractString,
     throw::Bool=true
 )
 
-    fpar = iscaparameterscopy(); pinfo = iscaparametersload(); eparID = pinfo[:,2];
+    fpar = iscaparametercopy(); pinfo = iscaparameterload(); eparID = pinfo[:,2];
 
     if sum(eparID.==parID) > 0
 
@@ -129,9 +129,9 @@ function iscamodule(moduleID::AbstractString,init::AbstractDict)
 
 end
 
-function iscaparameters(parameterID::AbstractString,pressure::Real,imod::AbstractDict)
+function iscaparameter(parameterID::AbstractString,pressure::Real,imod::AbstractDict)
 
-    parlist = iscaparametersload(imod); mtype = imod["moduletype"];
+    parlist = iscaparameterload(imod); mtype = imod["moduletype"];
 
     if sum(parlist[:,2] .== parameterID) == 0
         error("$(Dates.now()) - Invalid parameter choice for \"$(uppercase(mtype))\".  Call queryipar(modID=$(mtype),parID=$(parameterID)) for more information.")
@@ -140,7 +140,7 @@ function iscaparameters(parameterID::AbstractString,pressure::Real,imod::Abstrac
     end
 
     parinfo = parlist[ID,:];
-    @info "$(Dates.now()) - Climateisca will analyze $(parinfo[3]) data."
+    @info "$(Dates.now()) - IscaTools will analyze $(parinfo[3]) data."
 
     if occursin("sfc",mtype)
         return Dict("ID"=>parinfo[2],"name"=>parinfo[3],"unit"=>parinfo[4],"level"=>"sfc");
@@ -148,10 +148,12 @@ function iscaparameters(parameterID::AbstractString,pressure::Real,imod::Abstrac
 
         if pressure == 0
             error("$(Dates.now()) - You defined a pressure module \"$(uppercase(mtype))\" but you did not specify a pressure.")
+        else
+            lvl = iscapre2lvl(pressure,imod)
+            @info "$(Dates.now()) - You have requested $(uppercase(parinfo[3])) data at pressure $(pressure) Pa.  Based on a reference pressure of $(uppercase(imod["sealp"])) Pa, this corresponds to σ-level $lvl out of $(length(imod["levels"]))."
         end
 
-        lvl = iscapre2lvl(pressure,imod)
-        return Dict("ID"=>parinfo[2],"name"=>parinfo[3],"unit"=>parinfo[4],"level"=>undef);
+        return Dict("ID"=>parinfo[2],"name"=>parinfo[3],"unit"=>parinfo[4],"level"=>lvl);
 
     end
 
@@ -160,10 +162,10 @@ end
 function iscainitialize(
     init::AbstractDict;
     modID::AbstractString, parID::AbstractString,
-    prehPa::Real=0
+    pressure::Real=0
 )
 
-    imod = iscamodule(modID,init); ipar = iscaparameters(parID,prehPa,imod);
+    imod = iscamodule(modID,init); ipar = iscaparameter(parID,pressure,imod);
     itime = deepcopy(init);
     delete!(itime,"halfs"); delete!(itime,"fulls"); delete!(itime,"sealp");
 
