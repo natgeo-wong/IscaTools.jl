@@ -15,8 +15,11 @@ using Printf
 
 ## Exporting the following functions:
 export
-        iscaroot, iscastartup, retrievetime,
-        iscainitialize, iscapre2lvl
+        iscaroot, iscastartup, iscainitialize, iscancread, iscaanalysis,
+        iscarawfolder, iscarawname, iscarawread,
+        iscaanafolder, iscaananame, iscaanaread,
+        iscaparameterload, iscaparametercopy, iscaparameteradd,
+        retrievetime, iscapre2lvl
 
 ## Including other files in the module
 
