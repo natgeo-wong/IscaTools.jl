@@ -36,6 +36,7 @@ function retrievetime(fnc::AbstractString)
 
     if cal == "THIRTY_DAY"; t = thirty2threesixty(t,tdict["units"]) end
 
+    tinfo["calender"] = tattr["calendar"]
     tinfo["nhr"] = 0; tinfo["ndy"] = 0;
     tinfo["time"] = t; tstep = t[2] - t[1];
     tinfo["ncattribs"] = tdict;
@@ -44,11 +45,13 @@ function retrievetime(fnc::AbstractString)
 
         unit = split(tattr["units"]," since ")[1];
         if occursin("day",unit)
-            if tstep <= 1;  tinfo["nhr"] = 1 / tstep end
+            if tstep < 1;  tinfo["nhr"] = 1 / tstep end
             tinfo["ndy"] = length(t) * tstep;
         elseif occursin("hour",unit)
-            if tstep <= 24; tinfo["nhr"] = 24 / tstep end
-            tinfo["ndy"] = length(t) * tstep/24;
+            if tstep < 24; tinfo["nhr"] = 24 / tstep end
+            tinfo["ndy"] = length(t) * tstep / 24;
+        elseif  occursin("month",unit)
+            tinfo["ndy"] = length(t) * tstep * 30;
         else
             error("$(Dates.now()) - IscaTools.jl requires that if your calendar was set to \"NO_CALENDAR\", you need to express the frequency at which you save your data in units of hours or days.")
         end
@@ -60,6 +63,8 @@ function retrievetime(fnc::AbstractString)
 
     end
 
+    if round(Int,tinfo["nhr"]) != tinfo["nhr"]; tinfo["nhr"] = 0; end
+
     if cal == "NOLEAP" && tinfo["ndy"] !== 365
         @error("$(Dates.now()) - IscaTools.jl requires that if your calendar was set to \"NOLEAP\" or \"JULIAN\", your output data $(BOLD("MUST")) be saved every $(BOLD("year (360 days)")).")
     elseif cal == "JULIAN" && sum(tinfo["ndy"] .== [365,366]) == 0
@@ -69,6 +74,8 @@ function retrievetime(fnc::AbstractString)
     elseif cal == "NO_CALENDAR" && sum(tinfo["ndy"] .== [30,360]) == 0
         @warn "$(Dates.now()) - IscaTools.jl has detected that your calendar was set to \"NO_CALENDAR\", and that you did not save data every $(BOLD("month (30 days)")), or $(BOLD("year (360 days)")).  Therefore, IscaTools.jl will perform time-averaging operations over the length of the $(BOLD("entire run ($(tinfo["ndy"]) days)"))."
     end
+
+    if tinfo["ndy"] = 30; tinfo["isyear"] = false; else; tinfo["isyear"] = true; end
 
     return tinfo
 
