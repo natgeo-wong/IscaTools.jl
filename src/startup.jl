@@ -1,5 +1,5 @@
 """
-This file initializes the ClimateIsca module by defining the directories relevant to the particular Isca experiment being resorted and analysed by ClimateIsca.
+This file initializes the IscaTools module by defining the directories relevant to the particular Isca experiment being resorted and analysed by IscaTools.
 """
 
 function irootdict()
@@ -8,6 +8,7 @@ function irootdict()
     idict["root"] = ""; idict["raw"] = ""; idict["ana"] = "";
     idict["experiment"] = ""; idict["configuration"] = "";
     idict["spinup"] = ""; idict["control"] = "";
+    idict["fname"] = "";
 
     return idict
 
@@ -137,8 +138,14 @@ function iscastartup(;
     iroot = iscaroot(prjpath=prjpath,rawpath=rawpath,anapath=anapath,
                      experiment=experiment,config=config)
 
-    fnc = joinpath(iroot["raw"],"run0001",fname); ds = Dataset(fnc);
-    bk  = ds["bk"][:]*1; sig = (bk[1:end-1].+bk[2:end])/2;
+    fnc = joinpath(iroot["raw"],"run0001","$fname.nc");
+    if !isfile(fnc)
+        error("$(Dates.now()) - The output file \"$fname.nc\" does not exist.  Please double-check the filename in which the Isca raw data was save into and try again.")
+    else
+        iroot["name"] = "$fname.nc";
+    end
+
+    ds = Dataset(fnc); bk = ds["bk"][:]*1; sig = (bk[1:end-1].+bk[2:end])/2; close(ds);
 
     init = retrievetime(fnc); retrieveruns!(init,iroot)
     init["halfs"] = bk; init["fulls"] = sig; init["sealp"] = slp;
