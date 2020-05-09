@@ -75,7 +75,7 @@ function retrievetime(fnc::AbstractString)
         @warn "$(Dates.now()) - IscaTools.jl has detected that your calendar was set to \"NO_CALENDAR\", and that you did not save data every $(BOLD("month (30 days)")), or $(BOLD("year (360 days)")).  Therefore, IscaTools.jl will perform time-averaging operations over the length of the $(BOLD("entire run ($(tinfo["ndy"]) days)"))."
     end
 
-    if tinfo["ndy"] = 30; tinfo["isyear"] = false; else; tinfo["isyear"] = true; end
+    if tinfo["ndy"] == 30; tinfo["isyear"] = false; else; tinfo["isyear"] = true; end
 
     return tinfo
 
