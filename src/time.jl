@@ -84,11 +84,11 @@ end
 function retrieveruns!(itime::AbstractDict,iroot::AbstractDict)
 
     fol = glob("run*",iroot["raw"]); nfol = length(fol);
-    itime["nruns"] = length(nfol);
+    itime["nruns"] = nfol;
 
     if isdir(iroot["spinup"])
           fol = glob("run*",iroot["spinup"]); nfol = length(fol);
-          itime["nspin"] = length(nfol);
+          itime["nspin"] = nfol;
     else; itime["nspin"] = 0;
     end
 

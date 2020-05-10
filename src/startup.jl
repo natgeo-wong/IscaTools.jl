@@ -142,7 +142,7 @@ function iscastartup(;
     if !isfile(fnc)
         error("$(Dates.now()) - The output file \"$fname.nc\" does not exist.  Please double-check the filename in which the Isca raw data was save into and try again.")
     else
-        iroot["name"] = "$fname.nc";
+        iroot["fname"] = "$fname.nc";
     end
 
     ds = Dataset(fnc); bk = ds["bk"][:]*1; sig = (bk[1:end-1].+bk[2:end])/2; close(ds);
