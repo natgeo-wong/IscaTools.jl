@@ -2,21 +2,21 @@
 
 iscancread(ncname::AbstractString,fol::AbstractString="") = Dataset(joinpath(fol,ncname))
 
-function iscarawfolder(iroot::AbstractDict;run::Integer)
+function iscarawfolder(iroot::AbstractDict;irun::Integer)
 
-    return joinpath(iroot["raw"],"run$(@sprintf("%04d",run))")
-
-end
-
-function iscarawname(iroot::AbstractDict;run::Integer)
-
-    return joinpath(iroot["raw"],"run$(@sprintf("%04d",run))",iroot["fname"])
+    return joinpath(iroot["raw"],"run$(@sprintf("%04d",irun))")
 
 end
 
-function iscarawread(ipar::AbstractDict,iroot::AbstractDict;run::Integer)
+function iscarawname(iroot::AbstractDict;irun::Integer)
 
-    inc = iscarawname(iroot;run=run); ids = iscancread(inc)
+    return joinpath(iroot["raw"],"run$(@sprintf("%04d",irun))",iroot["fname"])
+
+end
+
+function iscarawread(ipar::AbstractDict,iroot::AbstractDict;irun::Integer)
+
+    inc = iscarawname(iroot;irun=irun); ids = iscancread(inc)
     return ids,ids[ipar["ID"]]
 
 end
@@ -45,25 +45,25 @@ function iscaanafolder(ipar::AbstractDict,iroot::AbstractDict)
     return fol
 end
 
-function iscaananame(ipar::AbstractDict;run::Integer)
+function iscaananame(ipar::AbstractDict;irun::Integer)
 
     if ipar["level"] != "sfc"
           fname = "$(ipar["ID"])-lvl$(@sprintf("%02d",ipar["level"]))";
     else; fname = "$(ipar["ID"])-sfc";
     end
 
-    return "$(fname)-run$(@sprintf("%04d",run)).nc"
+    return "$(fname)-run$(@sprintf("%04d",irun)).nc"
 
 end
 
 function iscaanaread(
     ID::AbstractString,
     ipar::AbstractDict,iroot::AbstractDict;
-    run::Integer
+    irun::Integer
 )
 
     ibase = iscaanafol(ipar,iroot)
-    inc = iscaananame(ipar;run=run);
+    inc = iscaananame(ipar;irun=irun);
     ids = iscancread(inc,ibase)
     return ids,ids[ID]
 
