@@ -91,13 +91,13 @@ function iscaanalysis360daily(
     irun::Integer
 )
 
-    rds,rvar = iscarawread(ipar,iroot,run=irun);
-    attr = Dict{AbstractString,AbstractDict}();
-    lon = rds["lon"][:]*1; attr["lon"] = rds["lon"].attrib; nlon = length(lon)
-    lat = rds["lat"][:]*1; attr["lat"] = rds["lat"].attrib; nlat = length(lat)
+    rds,rvar = iscarawread(ipar,iroot,irun=irun);
+    attr = Dict{AbstractString,Any}();
+    lon = rds["lon"][:]*1; nlon = length(lon)
+    lat = rds["lat"][:]*1; nlat = length(lat)
     lvl = ipar["level"];
 
-    if lvl != "sfc"; raw = rvar[:,:,lvl,:]*1; else; raw = rvar[:]*1; end
+    if lvl != "sfc"; raw = rvar[:,:,lvl,:]*1; else; raw = rvar[:]*1; end; close(rds);
     raw = reshape(raw,nlon,nlat,:,12)
 
     davg = zeros(Float32,nlon,nlat,13); dstd = zeros(Float32,nlon,nlat,13);
@@ -111,8 +111,8 @@ function iscaanalysis360daily(
 
     for mo = 1 : 12
 
-        @info "$(Dates.now()) - Analyzing $(uppercase(imod["dataset"])) $(imod["name"]) data for MONTH $mo of RUN $irun ..."
-        rawii = @view raw[:,:,:,ii]
+        @info "$(Dates.now()) - Analyzing $(uppercase(ipar["name"])) data for MONTH $mo of RUN $irun ..."
+        rawii = @view raw[:,:,:,mo]
 
         @debug "$(Dates.now()) - Extracting information on monthly climatology ..."
         davg[:,:,mo] = mean(rawii,dims=3);
@@ -122,22 +122,22 @@ function iscaanalysis360daily(
 
     end
 
-    @info "$(Dates.now()) - Calculating yearly climatology for $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
+    @info "$(Dates.now()) - Calculating yearly climatology for $(uppercase(ipar["name"])) for RUN $irun ..."
     davg[:,:,end] = mean(davg[:,:,1:12],dims=3);
     dstd[:,:,end] = mean(dstd[:,:,1:12],dims=3);
     dmax[:,:,end] = maximum(dmax[:,:,1:12],dims=3);
     dmin[:,:,end] = minimum(dmin[:,:,1:12],dims=3);
 
-    @info "$(Dates.now()) - Calculating zonal-averaged climatology for $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
-    for ilat = 1 : nlat, it = 1 : nt+1, imo = 1 : 13
+    @info "$(Dates.now()) - Calculating zonal-averaged climatology for $(uppercase(ipar["name"])) for RUN $irun ..."
+    for imo = 1 : 12, ilat = 1 : nlat
         zavg[ilat,imo] = iscananmean(@view davg[:,ilat,imo]);
         zstd[ilat,imo] = iscananmean(@view dstd[:,ilat,imo]);
         zmax[ilat,imo] = iscananmean(@view dmax[:,ilat,imo]);
         zmin[ilat,imo] = iscananmean(@view dmin[:,ilat,imo]);
     end
 
-    @info "$(Dates.now()) - Calculating meridional-averaged climatology for $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
-    for imo = 1 : 13, it = 1 : nt+1, ilon = 1 : nlon;
+    @info "$(Dates.now()) - Calculating meridional-averaged climatology for $(uppercase(ipar["name"])) for RUN $irun ..."
+    for imo = 1 : 12, ilon = 1 : nlon
         mavg[ilon,imo] = iscananmean(@view davg[ilon,:,imo]);
         mstd[ilon,imo] = iscananmean(@view dstd[ilon,:,imo]);
         mmax[ilon,imo] = iscananmean(@view dmax[ilon,:,imo]);
@@ -148,8 +148,7 @@ function iscaanalysis360daily(
         [davg,dstd,dmax,dmin],
         [zavg,zstd,zmax,zmin],
         [mavg,mstd,mmax,mmin],
-        attr,imod,ipar,ireg,iroot,
-        run=run
+        imod,ipar,iroot,irun=irun
     )
 
 end
@@ -158,15 +157,14 @@ function iscaanasavedaily(
     data::Array{Array{Float32,3},1},
     zdata::Array{Array{Float32,2},1},
     mdata::Array{Array{Float32,2},1},
-    attr::AbstractDict,
     imod::AbstractDict, ipar::AbstractDict, iroot::AbstractDict;
-    run::Integer
+    irun::Integer
 )
 
-    @info "$(Dates.now()) - Saving analysed $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
+    @info "$(Dates.now()) - Saving analysed $(uppercase(ipar["name"])) for RUN $irun ..."
 
     afol = iscaanafolder(ipar,iroot);
-    fana = iscaananame(ipar,run=run);
+    fana = iscaananame(ipar,irun=irun);
     afnc = joinpath(afol,fana);
 
     if isfile(afnc)
@@ -174,124 +172,141 @@ function iscaanasavedaily(
         rm(afnc);
     end
 
-    @debug "$(Dates.now()) - Creating NetCDF file $(afnc) for analyzed $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
+    @debug "$(Dates.now()) - Creating NetCDF file $(afnc) for analyzed $(uppercase(ipar["name"])) for RUN $irun ..."
 
     ds = Dataset(afnc,"c");
-    ds.dim["longitude"] = ereg["size"][1]; ds.dim["latitude"] = ereg["size"][2];
-    nt = hrindy(emod); ds.dim["hour"] = nt; ds.dim["month"] = 12;
+    ds.dim["longitude"] = length(imod["lon"])
+    ds.dim["latitude"] = length(imod["lat"])
+    ds.dim["month"] = 12;
 
-    dlon = defVar(ds,"longitude",Float32,("longitude",),attrib=attr["lon"])
-    dlon[:] = ereg["lon"];
+    nclon = defVar(ds,"lon", Float64, ("longitude",), attrib = OrderedDict(
+        "long_name"      => "longitude",
+        "units"          => "degrees_E",
+        "cartesian_axis" => "X",
+        "edges"          => "lonb",
+    ))
 
-    dlat = defVar(ds,"latitude",Float32,("latitude",),attrib=attr["lat"])
-    dlat[:] = ereg["lat"];
+    nclat = defVar(ds,"lat", Float64, ("latitude",), attrib = OrderedDict(
+        "long_name"      => "latitude",
+        "units"          => "degrees_N",
+        "cartesian_axis" => "Y",
+        "edges"          => "latb",
+    ))
 
-    @debug "$(Dates.now()) - Saving analyzed $(uppercase(emod["dataset"])) $(epar["name"]) data for RUN $irun to NetCDF file $(afnc) ..."
+    nclon[:] = imod["lon"]
+    nclat[:] = imod["lat"]
+
+    attr_var = OrderedDict(
+        "long_name"      => ipar["name"],
+        "units"          => ipar["unit"],
+    );
+
+    @debug "$(Dates.now()) - Saving analyzed $(uppercase(ipar["name"])) data for RUN $irun to NetCDF file $(afnc) ..."
 
     v = defVar(ds,"domain_yearly_mean_climatology",Float32,
-               ("longitude","latitude"),attrib=attr["var"]);
+               ("longitude","latitude"),attrib=attr_var);
     v[:] = data[1][:,:,end];
 
     v = defVar(ds,"domain_yearly_std_climatology",Float32,
-               ("longitude","latitude"),attrib=attr["var"]);
+               ("longitude","latitude"),attrib=attr_var);
     v[:] = data[2][:,:,end];
 
     v = defVar(ds,"domain_yearly_maximum_climatology",Float32,
-               ("longitude","latitude"),attrib=attr["var"]);
+               ("longitude","latitude"),attrib=attr_var);
     v[:] = data[3][:,:,end];
 
     v = defVar(ds,"domain_yearly_minimum_climatology",Float32,
-               ("longitude","latitude"),attrib=attr["var"]);
+               ("longitude","latitude"),attrib=attr_var);
     v[:] = data[4][:,:,end];
 
 
     v = defVar(ds,"domain_monthly_mean_climatology",Float32,
-               ("longitude","latitude","month"),attrib=attr["var"]);
+               ("longitude","latitude","month"),attrib=attr_var);
     v[:] = data[1][:,:,1:12];
 
     v = defVar(ds,"domain_monthly_std_climatology",Float32,
-               ("longitude","latitude","month"),attrib=attr["var"]);
+               ("longitude","latitude","month"),attrib=attr_var);
     v[:] = data[2][:,:,1:12];
 
     v = defVar(ds,"domain_monthly_maximum_climatology",Float32,
-               ("longitude","latitude","month"),attrib=attr["var"]);
+               ("longitude","latitude","month"),attrib=attr_var);
     v[:] = data[3][:,:,1:12];
 
     v = defVar(ds,"domain_monthly_minimum_climatology",Float32,
-               ("longitude","latitude","month"),attrib=attr["var"]);
+               ("longitude","latitude","month"),attrib=attr_var);
     v[:] = data[4][:,:,1:12];
 
 
     v = defVar(ds,"zonalavg_yearly_mean_climatology",Float32,
-               ("latitude",),attrib=attr["var"]);
+               ("latitude",),attrib=attr_var);
     v[:] = zdata[1][:,end];
 
     v = defVar(ds,"zonalavg_yearly_std_climatology",Float32,
-               ("latitude",),attrib=attr["var"]);
+               ("latitude",),attrib=attr_var);
     v[:] = zdata[2][:,end];
 
     v = defVar(ds,"zonalavg_yearly_maximum_climatology",Float32,
-               ("latitude",),attrib=attr["var"]);
+               ("latitude",),attrib=attr_var);
     v[:] = zdata[3][:,end];
 
     v = defVar(ds,"zonalavg_yearly_minimum_climatology",Float32,
-               ("latitude",),attrib=attr["var"]);
+               ("latitude",),attrib=attr_var);
     v[:] = zdata[4][:,end];
 
 
     v = defVar(ds,"zonalavg_monthly_mean_climatology",Float32,
-               ("latitude","month"),attrib=attr["var"]);
+               ("latitude","month"),attrib=attr_var);
     v[:] = zdata[1][:,1:12];
 
     v = defVar(ds,"zonalavg_monthly_std_climatology",Float32,
-               ("latitude","month"),attrib=attr["var"]);
+               ("latitude","month"),attrib=attr_var);
     v[:] = zdata[2][:,1:12];
 
     v = defVar(ds,"zonalavg_monthly_maximum_climatology",Float32,
-               ("latitude","month"),attrib=attr["var"]);
+               ("latitude","month"),attrib=attr_var);
     v[:] = zdata[3][:,1:12];
 
     v = defVar(ds,"zonalavg_monthly_minimum_climatology",Float32,
-               ("latitude","month"),attrib=attr["var"]);
+               ("latitude","month"),attrib=attr_var);
     v[:] = zdata[4][:,1:12];
 
 
     v = defVar(ds,"meridionalavg_yearly_mean_climatology",Float32,
-               ("longitude",),attrib=attr["var"]);
+               ("longitude",),attrib=attr_var);
     v[:] = mdata[1][:,end];
 
     v = defVar(ds,"meridionalavg_yearly_std_climatology",Float32,
-               ("longitude",),attrib=attr["var"]);
+               ("longitude",),attrib=attr_var);
     v[:] = mdata[2][:,end];
 
     v = defVar(ds,"meridionalavg_yearly_maximum_climatology",Float32,
-               ("longitude",),attrib=attr["var"]);
+               ("longitude",),attrib=attr_var);
     v[:] = mdata[3][:,end];
 
     v = defVar(ds,"meridionalavg_yearly_minimum_climatology",Float32,
-               ("longitude",),attrib=attr["var"]);
+               ("longitude",),attrib=attr_var);
     v[:] = mdata[4][:,end];
 
 
     v = defVar(ds,"meridionalavg_monthly_mean_climatology",Float32,
-               ("longitude","month"),attrib=attr["var"]);
+               ("longitude","month"),attrib=attr_var);
     v[:] = mdata[1][:,1:12];
 
     v = defVar(ds,"meridionalavg_monthly_std_climatology",Float32,
-               ("longitude","month"),attrib=attr["var"]);
+               ("longitude","month"),attrib=attr_var);
     v[:] = mdata[2][:,1:12];
 
     v = defVar(ds,"meridionalavg_monthly_maximum_climatology",Float32,
-               ("longitude","month"),attrib=attr["var"]);
+               ("longitude","month"),attrib=attr_var);
     v[:] = mdata[3][:,1:12];
 
     v = defVar(ds,"meridionalavg_monthly_minimum_climatology",Float32,
-               ("longitude","month"),attrib=attr["var"]);
+               ("longitude","month"),attrib=attr_var);
     v[:] = mdata[4][:,1:12];
 
 
     close(ds);
 
-    @info "$(Dates.now()) - Analysed $(uppercase(emod["dataset"])) $(epar["name"]) data for RUN $irun has been saved into file $(afnc) and moved to the data directory $(afol)."
+    @info "$(Dates.now()) - Analysed $(uppercase(ipar["name"])) data for RUN $irun has been saved into file $(afnc) and moved to the data directory $(afol)."
 
 end

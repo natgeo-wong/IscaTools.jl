@@ -86,7 +86,7 @@ function iscaroot(
         error("$(Dates.now()) - The folder $(iroot["raw"]) does not exist.  Please ensure that you have entered the correct project PATH, EXPERIMENT (if applicable), and CONFIGURATION details.")
     end
 
-    iroot["ana"] = joinpath(anapath,experiment)
+    iroot["ana"] = joinpath(anapath,experiment,config)
     iroot["experiment"] = experiment; iroot["configuration"] = config;
 
     @info "$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))\n  $(BOLD("Raw Directory:")) $rawpath\n  $(BOLD("Experiment:")) $experiment\n  $(BOLD("Configuration:")) $config"
