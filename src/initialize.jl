@@ -124,6 +124,8 @@ function iscamodule(moduleID::AbstractString,init::AbstractDict)
     imod["halfs"] = init["halfs"];
     imod["fulls"] = init["fulls"];
     imod["sealp"] = init["sealp"];
+    imod["lon"]   = init["lon"];
+    imod["lat"]   = init["lat"];
 
     return imod
 
@@ -159,15 +161,25 @@ function iscaparameter(parameterID::AbstractString,pressure::Real,imod::Abstract
 
 end
 
+function iscatime(init)
+
+    itime = deepcopy(init);
+    delete!(itime,"halfs"); delete!(itime,"fulls"); delete!(itime,"sealp");
+    delete!(itime,"lon"); delete!(itime,"lat");
+
+    return itime
+
+end
+
 function iscainitialize(
     init::AbstractDict;
     modID::AbstractString, parID::AbstractString,
     pressure::Real=0
 )
 
-    imod = iscamodule(modID,init); ipar = iscaparameter(parID,pressure,imod);
-    itime = deepcopy(init);
-    delete!(itime,"halfs"); delete!(itime,"fulls"); delete!(itime,"sealp");
+    imod  = iscamodule(modID,init);
+    ipar  = iscaparameter(parID,pressure,imod);
+    itime = iscatime(init);
 
     return imod,ipar,itime
 

@@ -145,10 +145,14 @@ function iscastartup(;
         iroot["fname"] = "$fname.nc";
     end
 
-    ds = Dataset(fnc); bk = ds["bk"][:]*1; sig = (bk[1:end-1].+bk[2:end])/2; close(ds);
+    ds = Dataset(fnc);
+    bk = ds["bk"][:]*1; sig = (bk[1:end-1].+bk[2:end])/2;
+    lon = ds["lon"][:]*1; lat = ds["lat"][:]*1;
+    close(ds);
 
     init = retrievetime(fnc); retrieveruns!(init,iroot)
     init["halfs"] = bk; init["fulls"] = sig; init["sealp"] = slp;
+    init["lon"] = lon; init["lat"] = lat;
 
     return init,iroot
 
