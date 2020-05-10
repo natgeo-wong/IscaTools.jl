@@ -36,7 +36,7 @@ function retrievetime(fnc::AbstractString)
 
     if cal == "THIRTY_DAY"; t = thirty2threesixty(t,tdict["units"]) end
 
-    tinfo["calender"] = tattr["calendar"]
+    tinfo["calendar"] = tattr["calendar"]
     tinfo["nhr"] = 0; tinfo["ndy"] = 0;
     tinfo["time"] = t; tstep = t[2] - t[1];
     tinfo["ncattribs"] = tdict;
