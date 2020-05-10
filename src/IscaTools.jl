@@ -12,6 +12,7 @@ using Glob
 using JLD2
 using NCDatasets
 using Printf
+using Statistics
 
 ## Exporting the following functions:
 export
