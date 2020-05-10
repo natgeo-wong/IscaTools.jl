@@ -122,13 +122,13 @@ function iscaanalysis360daily(
 
     end
 
-    @info "$(Dates.now()) - Calculating yearly climatology for $(uppercase(emod["dataset"])) $(epar["name"]) data in $(gregionfullname(ereg["region"])) during $yr ..."
+    @info "$(Dates.now()) - Calculating yearly climatology for $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
     davg[:,:,end] = mean(davg[:,:,1:12],dims=3);
     dstd[:,:,end] = mean(dstd[:,:,1:12],dims=3);
     dmax[:,:,end] = maximum(dmax[:,:,1:12],dims=3);
     dmin[:,:,end] = minimum(dmin[:,:,1:12],dims=3);
 
-    @info "$(Dates.now()) - Calculating zonal-aviscaged climatology for $(uppercase(emod["dataset"])) $(epar["name"]) data in $(gregionfullname(ereg["region"])) during $yr ..."
+    @info "$(Dates.now()) - Calculating zonal-averaged climatology for $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
     for ilat = 1 : nlat, it = 1 : nt+1, imo = 1 : 13
         zavg[ilat,imo] = iscananmean(@view davg[:,ilat,imo]);
         zstd[ilat,imo] = iscananmean(@view dstd[:,ilat,imo]);
@@ -136,7 +136,7 @@ function iscaanalysis360daily(
         zmin[ilat,imo] = iscananmean(@view dmin[:,ilat,imo]);
     end
 
-    @info "$(Dates.now()) - Calculating meridional-aviscaged climatology for $(uppercase(emod["dataset"])) $(epar["name"]) data in $(gregionfullname(ereg["region"])) during $yr ..."
+    @info "$(Dates.now()) - Calculating meridional-averaged climatology for $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
     for imo = 1 : 13, it = 1 : nt+1, ilon = 1 : nlon;
         mavg[ilon,imo] = iscananmean(@view davg[ilon,:,imo]);
         mstd[ilon,imo] = iscananmean(@view dstd[ilon,:,imo]);
@@ -159,11 +159,11 @@ function iscaanasavedaily(
     zdata::Array{Array{Float32,2},1},
     mdata::Array{Array{Float32,2},1},
     attr::AbstractDict,
-    imod::AbstractDict, imod::AbstractDict, iroot::AbstractDict;
+    imod::AbstractDict, ipar::AbstractDict, iroot::AbstractDict;
     run::Integer
 )
 
-    @info "$(Dates.now()) - Saving analysed $(uppercase(emod["dataset"])) $(epar["name"]) data in $(gregionfullname(ereg["region"])) for the year $yr ..."
+    @info "$(Dates.now()) - Saving analysed $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
 
     afol = iscaanafolder(ipar,iroot);
     fana = iscaananame(ipar,run=run);
@@ -174,7 +174,7 @@ function iscaanasavedaily(
         rm(afnc);
     end
 
-    @debug "$(Dates.now()) - Creating NetCDF file $(afnc) for analyzed $(emod["dataset"]) $(epar["name"]) data in $yr ..."
+    @debug "$(Dates.now()) - Creating NetCDF file $(afnc) for analyzed $(uppercase(imod["dataset"])) $(imod["name"]) for RUN $irun ..."
 
     ds = Dataset(afnc,"c");
     ds.dim["longitude"] = ereg["size"][1]; ds.dim["latitude"] = ereg["size"][2];
@@ -186,7 +186,7 @@ function iscaanasavedaily(
     dlat = defVar(ds,"latitude",Float32,("latitude",),attrib=attr["lat"])
     dlat[:] = ereg["lat"];
 
-    @debug "$(Dates.now()) - Saving analyzed $(uppercase(emod["dataset"])) $(epar["name"]) data for $yr to NetCDF file $(afnc) ..."
+    @debug "$(Dates.now()) - Saving analyzed $(uppercase(emod["dataset"])) $(epar["name"]) data for RUN $irun to NetCDF file $(afnc) ..."
 
     v = defVar(ds,"domain_yearly_mean_climatology",Float32,
                ("longitude","latitude"),attrib=attr["var"]);
@@ -292,6 +292,6 @@ function iscaanasavedaily(
 
     close(ds);
 
-    @info "$(Dates.now()) - Analysed $(uppercase(emod["dataset"])) $(epar["name"]) for the year $yr in $(gregionfullname(ereg["region"])) has been saved into file $(afnc) and moved to the data directory $(afol)."
+    @info "$(Dates.now()) - Analysed $(uppercase(emod["dataset"])) $(epar["name"]) data for RUN $irun has been saved into file $(afnc) and moved to the data directory $(afol)."
 
 end
