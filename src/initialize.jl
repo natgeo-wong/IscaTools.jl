@@ -152,7 +152,7 @@ function iscaparameter(parameterID::AbstractString,pressure::Real,imod::Abstract
             error("$(Dates.now()) - You defined a pressure module \"$(uppercase(mtype))\" but you did not specify a pressure.")
         else
             lvl = iscapre2lvl(pressure,imod)
-            @info "$(Dates.now()) - You have requested $(uppercase(parinfo[3])) data at pressure $(pressure) Pa.  Based on a reference pressure of $(uppercase(imod["sealp"])) Pa, this corresponds to σ-level $lvl out of $(length(imod["levels"]))."
+            @info "$(Dates.now()) - You have requested $(uppercase(parinfo[3])) data at pressure $(pressure) Pa.  Based on a reference pressure of $(imod["sealp"]) Pa, this corresponds to σ-level $lvl out of $(length(imod["levels"]))."
         end
 
         return Dict("ID"=>parinfo[2],"name"=>parinfo[3],"unit"=>parinfo[4],"level"=>lvl);

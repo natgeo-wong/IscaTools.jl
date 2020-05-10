@@ -34,7 +34,7 @@ function iscaanafolder(ipar::AbstractDict,iroot::AbstractDict)
     else
 
         phPa = "$(ipar["ID"])-lvl$(@sprintf("%02d",ipar["level"]))"
-        fol = joinpath(iroot["ana"],epar["ID"],phPa);
+        fol = joinpath(iroot["ana"],ipar["ID"],phPa);
         if !isdir(fol)
             @info "$(Dates.now()) - The folder for analyzed $(uppercase(ipar["ID"])) data at σ-level $(ipar["level"]) does not exist.  Creating now ..."
             mkpath(fol);
