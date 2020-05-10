@@ -179,14 +179,14 @@ function iscaanasavedaily(
     ds.dim["latitude"] = length(imod["lat"])
     ds.dim["month"] = 12;
 
-    nclon = defVar(ds,"lon", Float64, ("longitude",), attrib = OrderedDict(
+    nclon = defVar(ds,"lon", Float64, ("longitude",), attrib = Dict(
         "long_name"      => "longitude",
         "units"          => "degrees_E",
         "cartesian_axis" => "X",
         "edges"          => "lonb",
     ))
 
-    nclat = defVar(ds,"lat", Float64, ("latitude",), attrib = OrderedDict(
+    nclat = defVar(ds,"lat", Float64, ("latitude",), attrib = Dict(
         "long_name"      => "latitude",
         "units"          => "degrees_N",
         "cartesian_axis" => "Y",
@@ -196,9 +196,9 @@ function iscaanasavedaily(
     nclon[:] = imod["lon"]
     nclat[:] = imod["lat"]
 
-    attr_var = OrderedDict(
-        "long_name"      => ipar["name"],
-        "units"          => ipar["unit"],
+    attr_var = Dict(
+        "long_name" => ipar["name"],
+        "units"     => ipar["unit"],
     );
 
     @debug "$(Dates.now()) - Saving analyzed $(uppercase(ipar["name"])) data for RUN $irun to NetCDF file $(afnc) ..."
