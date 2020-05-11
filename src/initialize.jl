@@ -145,17 +145,33 @@ function iscaparameter(parameterID::AbstractString,pressure::Real,imod::Abstract
     @info "$(Dates.now()) - IscaTools will analyze $(parinfo[3]) data."
 
     if occursin("sfc",mtype)
+
+        if pressure != 0
+            @warn "$(Dates.now()) - You asked to analyze data at pressure $(pressure) Pa but have chosen a surface module variable.  Setting pressure level to \"SFC\" by default"
+        end
         return Dict("ID"=>parinfo[2],"name"=>parinfo[3],"unit"=>parinfo[4],"level"=>"sfc");
+
     else
 
         if pressure == 0
-            error("$(Dates.now()) - You defined a pressure module \"$(uppercase(mtype))\" but you did not specify a pressure.")
+
+            @warn "$(Dates.now()) - You defined a pressure module \"$(uppercase(mtype))\" but you did not specify a pressure.  Setting pressure level to \"ALL\" - this may prevent usage of some IscaTool functionalities."
+            return Dict(
+                "ID"=>parinfo[2],"name"=>parinfo[3],
+                "unit"=>parinfo[4],"level"=>"all"
+            );
+
         else
+
             lvl = iscapre2lvl(pressure,imod)
             @info "$(Dates.now()) - You have requested $(uppercase(parinfo[3])) data at pressure $(pressure) Pa.  Based on a reference pressure of $(imod["sealp"]) Pa, this corresponds to σ-level $lvl out of $(length(imod["levels"]))."
-        end
 
-        return Dict("ID"=>parinfo[2],"name"=>parinfo[3],"unit"=>parinfo[4],"level"=>lvl);
+            return Dict(
+                "ID"=>parinfo[2],"name"=>parinfo[3],
+                "unit"=>parinfo[4],"level"=>lvl
+            );
+
+        end
 
     end
 
