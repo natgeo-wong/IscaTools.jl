@@ -17,7 +17,7 @@ end
 function iscaanalysis(
     init::AbstractDict, iroot::AbstractDict;
     modID::AbstractString, parID::AbstractString,
-    plvls::Union{AbstractString,Integer,Vector{<:Real}}
+    plvls::Union{AbstractString,Real,Vector{<:Real}}
 )
 
     if typeof(plvls) <: Array
