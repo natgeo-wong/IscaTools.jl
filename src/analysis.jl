@@ -23,14 +23,14 @@ function iscaanalysis(
     if typeof(plvls) <: Array
         for p in plvls
             imod,ipar,itime = iscainitialize(init;modID=modID,parID=parID,pressure=p);
-            iscaanalysis(imod,ipar,itime,iroot)
+            iscaanalysis(imod,ipar,itime,iroot); putinfo(imod,ipar,itime,iroot)
         end
     else
         if plvls == "sfc"
               imod,ipar,itime = iscainitialize(init;modID=modID,parID=parID)
         else; imod,ipar,itime = iscainitialize(init;modID=modID,parID=parID,pressure=plvls);
         end
-        iscaanalysis(imod,ipar,itime,iroot)
+        iscaanalysis(imod,ipar,itime,iroot); putinfo(imod,ipar,itime,iroot)
     end
 
 end

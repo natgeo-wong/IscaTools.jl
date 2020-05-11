@@ -75,3 +75,12 @@ function iscapre2lvl(pressure::Real,imod::AbstractDict)
     return argmin(abs.(sealp*sigma .- pressure))
 
 end
+
+function putinfo(imod::Dict,ipar::Dict,itime::Dict,iroot::Dict)
+
+    rfol = pwd();
+    cd(iscaanafolder(ipar,iroot)); @save "info_par.jld2" imod ipar;
+    cd(iroot["ana"]); @save "info_time.jld2" itime;
+    cd(rfol);
+
+end
