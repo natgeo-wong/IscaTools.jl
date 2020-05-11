@@ -130,7 +130,6 @@ function iscastartup(;
     experiment::AbstractString="",
     config::AbstractString,
     fname::AbstractString,
-    slp::Real=1e5,
     welcome::Bool=true
 )
 
@@ -145,14 +144,16 @@ function iscastartup(;
         iroot["fname"] = "$fname.nc";
     end
 
-    ds = Dataset(fnc);
-    bk = ds["bk"][:]*1; sig = (bk[1:end-1].+bk[2:end])/2;
-    lon = ds["lon"][:]*1; lat = ds["lat"][:]*1;
-    close(ds);
 
     init = retrievetime(fnc); retrieveruns!(init,iroot)
-    init["halfs"] = bk; init["fulls"] = sig; init["sealp"] = slp;
-    init["lon"] = lon; init["lat"] = lat;
+
+    ds = Dataset(fnc);
+    init["phalf"] = ds["phalf"][:]*100;
+    init["pfull"] = ds["pfull"][:]*100;
+    init["sealp"] = ds["phalf"][end]*100;;
+    init["lon"]   = ds["lon"][:]*1;
+    init["lat"]   = ds["lat"][:]*1;
+    close(ds);
 
     return init,iroot
 

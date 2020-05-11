@@ -115,14 +115,14 @@ function iscamodule(moduleID::AbstractString,init::AbstractDict)
         imod["levels"] = ["sfc"];
     elseif moduleID == "half"
         @debug "$(Dates.now()) - A half-pressure module was selected, and therefore all available pressure levels will be saved into the parameter Dictionary."
-        imod["levels"] = init["halfs"]
+        imod["levels"] = init["phalf"]
     else
         @debug "$(Dates.now()) - A full-pressure module was selected, and therefore all available pressure levels will be saved into the parameter Dictionary."
-        imod["levels"] = init["fulls"]
+        imod["levels"] = init["pfull"]
     end
 
-    imod["halfs"] = init["halfs"];
-    imod["fulls"] = init["fulls"];
+    imod["phalf"] = init["phalf"];
+    imod["pfull"] = init["pfull"];
     imod["sealp"] = init["sealp"];
     imod["lon"]   = init["lon"];
     imod["lat"]   = init["lat"];
