@@ -11,6 +11,7 @@ using DelimitedFiles
 using Glob
 using JLD2
 using NCDatasets
+using NumericalIntegration
 using Printf
 using Statistics
 
@@ -20,6 +21,7 @@ export
         iscarawfolder, iscarawname, iscarawread,
         iscaanafolder, iscaananame, iscaanaread,
         iscaparameterload, iscaparametercopy, iscaparameteradd,
+        iscastreamfunction,
         retrievetime, iscapre2lvl
 
 ## Including other files in the module
@@ -32,7 +34,7 @@ include("frontend.jl")
 #include("raw.jl")
 #include("calculate.jl")
 #include("moisture.jl")
-#include("streamfunction.jl")
+include("streamfunction.jl")
 #include("eddies.jl")
 #include("fluxes.jl")
 
