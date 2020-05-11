@@ -41,13 +41,18 @@ function iscasavepsi(vpsi::Array{<:Real,3},iroot::AbstractDict,irun::Integer)
 
     inc = iscarawname(iroot,irun=irun); ids = Dataset(inc,"a");
 
-    v = defVar(ids,"psi_v",Float32,("lat","pfull","time"),attrib = Dict(
-        "long_name"     => "Meridional Streamfunction",
-        "units"         => "kg/s",
-        "scale_factor"  => 1e9,
-        "cell_methods"  => "time: mean",
-        "time_avg_info" => "average_T1,average_T2,average_DT",
-    ))
+    if haskey(ids,"psi_v")
+        v = ids["psi_v"]
+
+    else
+        v = defVar(ids,"psi_v",Float32,("lat","pfull","time"),attrib = Dict(
+            "long_name"     => "Meridional Streamfunction",
+            "units"         => "kg/s",
+            "scale_factor"  => 1e9,
+            "cell_methods"  => "time: mean",
+            "time_avg_info" => "average_T1,average_T2,average_DT",
+        ))
+    end
 
     v[:] = vpsi; close(ids)
 
