@@ -21,6 +21,19 @@ function iscarawread(ipar::AbstractDict,iroot::AbstractDict;irun::Integer)
 
 end
 
+function iscacalcname(ipar::AbstractDict,iroot::AbstractDict;irun::Integer)
+
+    return joinpath(iroot["raw"],"run$(@sprintf("%04d",irun))","atmos_$(ipar["ID"]).nc")
+
+end
+
+function iscacalcread(ipar::AbstractDict,iroot::AbstractDict;irun::Integer)
+
+    inc = iscacalcname(ipar,iroot;irun=irun); ids = iscancread(inc)
+    return ids,ids[ipar["ID"]]
+
+end
+
 function iscaanafolder(ipar::AbstractDict,iroot::AbstractDict)
 
     if ipar["level"] == "sfc";

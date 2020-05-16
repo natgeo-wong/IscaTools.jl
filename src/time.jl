@@ -39,6 +39,7 @@ function retrievetime(fnc::AbstractString)
     tinfo["calendar"] = tattr["calendar"]
     tinfo["nhr"] = 0; tinfo["ndy"] = 0;
     tinfo["time"] = t; tstep = t[2] - t[1];
+    tinfo["raw"] = ds["time"].var[:]
     tinfo["ncattribs"] = tdict;
 
     if cal == "NO_CALENDAR"
@@ -77,7 +78,7 @@ function retrievetime(fnc::AbstractString)
 
     if tinfo["ndy"] == 30; tinfo["isyear"] = false; else; tinfo["isyear"] = true; end
 
-    return tinfo
+    close(ds); return tinfo
 
 end
 
