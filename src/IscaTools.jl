@@ -18,7 +18,7 @@ using Statistics
 ## Exporting the following functions:
 export
         iscawelcome, iscaroot, iscastartup, iscainitialize, iscancread, iscaanalysis,
-        iscarawfolder, iscarawname, iscarawread,
+        iscarawfolder, iscarawname, iscarawread, iscacalcname, iscacalcread,
         iscaanafolder, iscaananame, iscaanaread,
         iscaparameterload, iscaparametercopy, iscaparameteradd,
         iscastreamfunction,
