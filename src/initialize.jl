@@ -50,7 +50,7 @@ end
 
 function iscaparameterdisp(parlist::AbstractArray,init::AbstractDict)
     @info "$(Dates.now()) - The following variables are offered in the $(init["modulename"]) module:"
-    for ii = 1 : size(parlist,1); @info "$(Dates.now()) - $(ii)) $(parlist[ii,6])" end
+    for ii = 1 : size(parlist,1); @info "$(Dates.now()) - $(ii)) $(parlist[ii,3])" end
 end
 
 function iscaparameteradd(fadd::AbstractString)
@@ -59,15 +59,16 @@ function iscaparameteradd(fadd::AbstractString)
     ainfo = readdlm(fadd,',',comments=true); aparID = ainfo[:,2]; nadd = length(aparID);
 
     for iadd = 1 : nadd
-        iscaparametiscadd(modID=ainfo[iadd,1],parID=ainfo[iadd,2],ncID=ainfo[iadd,3],
-                        isca5=ainfo[iadd,4],iscai=ainfo[iadd,5],
-                        full=ainfo[iadd,6],unit=ainfo[iadd,7],throw=false);
+        iscaparameteradd(
+            modID=ainfo[iadd,1],parID=ainfo[iadd,2],
+            full=ainfo[iadd,3],unit=ainfo[iadd,4],throw=false
+        );
     end
 
 end
 
 function iscaparameteradd(;
-    modID::AbstractString, parID::AbstractString, ncID::AbstractString,
+    modID::AbstractString, parID::AbstractString,
     full::AbstractString, unit::AbstractString,
     throw::Bool=true
 )
@@ -85,7 +86,7 @@ function iscaparameteradd(;
     else
 
         open(fpar,"a") do io
-            writedlm(io,[modID parID ncID full unit],',')
+            writedlm(io,[modID ncID full unit],',')
         end
 
     end

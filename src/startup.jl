@@ -16,7 +16,7 @@ end
 
 function iscaspin(iroot::AbstractDict)
 
-    efol = joinpath(iroot["root"],"raw",iroot["experiment"]); @info efol
+    efol = joinpath(iroot["root"],"raw",iroot["experiment"]);
     sfol = joinpath(iroot["root"],"raw",iroot["experiment"],"spinup");
     if isdir(sfol)
         @info "$(Dates.now()) - A spinup configuration folder has been identified in $(efol)."
