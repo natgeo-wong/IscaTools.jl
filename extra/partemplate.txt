@@ -1,4 +1,4 @@
-# (1)Mode,(2)ID,(3)IDnc,(4)era5,(5)erai,(6)Full,(7)Units
+# (1)Mode,(2)ID,(3)Full,(4)Units
 
 # SURFACE DRY PARAMETERS
 dsfc,u_10m,Surface Zonal Wind (10m),m s^{-1}
