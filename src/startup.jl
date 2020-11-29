@@ -16,8 +16,8 @@ end
 
 function iscaspin(iroot::AbstractDict)
 
-    efol = joinpath(iroot["root"],"raw",iroot["experiment"]);
-    sfol = joinpath(iroot["root"],"raw",iroot["experiment"],"spinup");
+    efol = joinpath(iroot["root"],iroot["experiment"]);
+    sfol = joinpath(iroot["root"],iroot["experiment"],"spinup");
     if isdir(sfol)
         @info "$(Dates.now()) - A spinup configuration folder has been identified in $(efol)."
         return true;
@@ -48,24 +48,29 @@ function iscaroot(
 )
 
     iroot = irootdict(); iroot["root"] = prjpath;
-    iroot["raw"] = joinpath(prjpath,"raw",experiment,config)
+    iroot["raw"] = joinpath(prjpath,experiment,config)
 
     if !isdir(iroot["raw"])
         error("$(Dates.now()) - The folder $(iroot["raw"]) does not exist.  Please ensure that you have entered the correct project PATH, EXPERIMENT (if applicable), and CONFIGURATION details.")
     end
 
-    iroot["ana"] = joinpath(prjpath,"ana",experiment,config)
+    iroot["ana"] = joinpath(prjpath,experiment,config,"analysis")
     iroot["experiment"] = experiment; iroot["configuration"] = config;
 
-    @info "$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))\n  $(BOLD("Root Directory:")) $prjpath\n  $(BOLD("Experiment:")) $experiment\n  $(BOLD("Configuration:")) $config"
-    @info "$(Dates.now()) - Isca GCM data RAW DATA directory: $(iroot["raw"])."
-    @info "$(Dates.now()) - Isca GCM data ANALYSIS directory: $(iroot["ana"])."
+    @info """$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))
+      $(BOLD("Project Directory:")) $prjpath
+      $(BOLD("Raw Data Directory:")) $(iroot["raw"])
+      $(BOLD("Analysis Directory:")) $(iroot["ana"])
+      $(BOLD("Experiment | Configuration:")) $experiment | $config
+    """
 
     if iscaspin(iroot)
         iroot["spinup"]  = replace(iroot["raw"],config=>"spinup")
         iroot["control"] = replace(iroot["raw"],config=>"control")
-        @info "$(Dates.now()) - Isca GCM data SPINUP directory: $(iroot["spinup"])."
-        @info "$(Dates.now()) - Isca GCM data CONTROL directory: $(iroot["control"])."
+        @info """$(Dates.now()) - $(BOLD("SPINUP DIRECTORIES:"))
+          $(BOLD("Spinup Directory:"))  $(iroot["spinup"])
+          $(BOLD("Control Directory:")) $(iroot["control"])
+        """
     end
 
     return iroot
@@ -87,17 +92,25 @@ function iscaroot(
     end
 
     iroot["ana"] = joinpath(anapath,experiment,config)
+    if !isdir(iroot["ana"])
+        @info "$(Dates.now()) - The folder $(iroot["ana"]) does not exist.  Creating now ..."
+    end
+
     iroot["experiment"] = experiment; iroot["configuration"] = config;
 
-    @info "$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))\n  $(BOLD("Raw Directory:")) $rawpath\n  $(BOLD("Experiment:")) $experiment\n  $(BOLD("Configuration:")) $config"
-    @info "$(Dates.now()) - Isca GCM data RAW DATA directory: $(iroot["raw"])."
-    @info "$(Dates.now()) - Isca GCM data ANALYSIS directory: $(iroot["ana"])."
+    @info """$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))
+      $(BOLD("Raw Data Directory:")) $(iroot["raw"])
+      $(BOLD("Analysis Directory:")) $(iroot["ana"])
+      $(BOLD("Experiment | Configuration:")) $experiment | $config
+    """
 
     if iscaspin(iroot)
         iroot["spinup"]  = replace(iroot["raw"],config=>"spinup")
         iroot["control"] = replace(iroot["raw"],config=>"control")
-        @info "$(Dates.now()) - Isca GCM data SPINUP directory: $(iroot["spinup"])."
-        @info "$(Dates.now()) - Isca GCM data CONTROL directory: $(iroot["control"])."
+        @info """$(Dates.now()) - $(BOLD("SPINUP DIRECTORIES:"))
+          $(BOLD("Spinup Directory:"))  $(iroot["spinup"])
+          $(BOLD("Control Directory:")) $(iroot["control"])
+        """
     end
 
     return iroot
@@ -145,15 +158,18 @@ function iscastartup(;
     end
 
 
-    init = retrievetime(fnc); retrieveruns!(init,iroot)
-
-    ds = Dataset(fnc);
-    init["phalf"] = ds["phalf"][:]*100;
-    init["pfull"] = ds["pfull"][:]*100;
-    init["sealp"] = ds["phalf"][end]*100;;
-    init["lon"]   = ds["lon"][:]*1;
-    init["lat"]   = ds["lat"][:]*1;
-    close(ds);
+    if isfile("$(iroot["raw"])/init.jld2")
+        @load "$(iroot["raw"])/init.jld2" init
+    else
+        init = retrievetime(fnc); retrieveruns!(init,iroot)
+        ds = Dataset(fnc);
+        init["phalf"] = ds["phalf"][:]*100;
+        init["pfull"] = ds["pfull"][:]*100;
+        init["sealp"] = ds["phalf"][end]*100;;
+        init["lon"]   = ds["lon"][:]*1;
+        init["lat"]   = ds["lat"][:]*1;
+        close(ds);
+    end
 
     return init,iroot
 
