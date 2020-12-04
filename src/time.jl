@@ -38,8 +38,14 @@ function retrievetime(fnc::AbstractString)
 
     tinfo["calendar"] = tattr["calendar"]
     tinfo["nhr"] = 0; tinfo["ndy"] = 0;
-    tinfo["time"] = t; tstep = t[2] - t[1];
+    tinfo["time"] = t; nt = length(t);
     tinfo["raw"] = ds["time"].var[:]
+
+    if nt > 1
+          tstep = tinfo["raw"][2] - tinfo["raw"][1]
+    else; tstep = tinfo["raw"][1] * 2
+    end
+    
     tinfo["ncattribs"] = tdict;
 
     if cal == "NO_CALENDAR"
