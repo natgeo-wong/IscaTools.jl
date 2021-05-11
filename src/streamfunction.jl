@@ -16,19 +16,25 @@ function iscacalcpsi(
 
     @info "$(Dates.now()) - Extracting MERIDIONAL WIND and PRESSURE data ..."
     inc = iscarawname(iroot,irun=irun); ids = Dataset(inc);
-    vwind = ids["vcomp"][:]*1; pfull = vcat(0,ids["pfull"][:]*100); lat = ids["lat"][:]*1;
+    vwind = ids["vcomp"][:]*1
+    pfull = ids["pfull"][:]*1
+    phsfc = ids["phalf"][end]*1
+    pfull = vcat(0,pfull/phsfc)
+    psfc  = ids["ps"][:]*1
+    lat = ids["lat"][:]*1;
     close(ids)
 
     @info "$(Dates.now()) - Reshape / Permutedims data for calculation ..."
     nlon,nlat,npre,nt = size(vwind);
     vwind = permutedims(dropdims(mean(vwind,dims=1),dims=1),[1,3,2]);
+    psfc  = dropdims(mean(psfc,dims=1),dims=1)
     vpsi = zeros(nlat,nt,npre); vii = zeros(npre+1); psiii = zeros(npre+1)
 
     @info "$(Dates.now()) - Performing Numerical Integration ..."
     for it = 1 : nt, ilat = 1 : nlat
 
         for ipre = 1 : npre; vii[ipre+1] = vwind[ilat,it,ipre] end
-        psiii .= cumul_integrate(pfull,vii)
+        psiii .= cumul_integrate(pfull*psfc[ilat,it],vii)
         for ipre = 1 : npre
             vpsi[ilat,it,ipre] = psiii[ipre+1] * 2 * pi * 6378e3 .* cosd.(lat[ilat]) / 9.81
         end
@@ -100,7 +106,7 @@ function iscasavepsi(
 
     nclon[:] = imod["lon"]
     nclat[:] = imod["lat"]
-    nctime.var[:] = itime["raw"]
+    nctime[:] = itime["raw"]
     ncphalf[:] = imod["phalf"]
     ncpfull[:] = imod["pfull"]
 
